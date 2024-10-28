@@ -25,7 +25,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const username = await validateUser()
-  console.log('username', username)
   return (
     <html lang="en">
       <body

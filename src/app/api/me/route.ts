@@ -24,7 +24,8 @@ export async function GET() {
       })
     } else {
       return NextResponse.json({
-        message: 'User accepted'
+        message: 'User accepted',
+        user: ((decoded as unknown as JwtPayload).userId as unknown as string)
       }, {
         status: HTTPStatus.OK
       })

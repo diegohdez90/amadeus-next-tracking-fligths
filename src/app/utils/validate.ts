@@ -13,7 +13,6 @@ export default async function validateUser() {
     if (!decoded) return null
 
     const payload = decoded as unknown as JwtPayload
-    console.log(payload)
     const { userId } = payload
     const user = await client.user.findFirst({
       where: {
