@@ -25,11 +25,6 @@ export default function Page() {
 
       if (!response.ok) throw new Error('Failed')
 
-      const {
-        jwt
-      } = await response.json()
-
-      document.cookie = `token=${jwt}; path=/`
       router.push('/home')
     } catch(e) {
       console.error(e)
