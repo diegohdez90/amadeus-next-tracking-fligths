@@ -12,8 +12,14 @@ const sign = function(payload: string) {
 }
 
 const verify = function(token: string) {
-  return jwt.verify(token, process.env.JWT_SECRET as unknown as string)
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET as unknown as string)
+    return verified
+  } catch (_) {
+    return false
+  }
 }
+
 
 export {
   sign,
