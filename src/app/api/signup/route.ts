@@ -3,6 +3,7 @@ import client from '../../../prisma/client'
 import * as pwd from '../../utils/password'
 import * as jwt from '../../utils/jwt';
 import { NextRequest, NextResponse } from 'next/server';
+import setCookie from '@/app/utils/set';
 
 
 type Body = {
@@ -28,6 +29,7 @@ export async function POST(
       }
     })
     const token = jwt.sign(result.id)
+    await setCookie(token)
     return NextResponse.json({
       message: 'User created',
       data: result.id,
