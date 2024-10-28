@@ -3,7 +3,6 @@ import client from '../../../prisma/client'
 import * as pwd from '../../utils/password'
 import * as jwt from '../../utils/jwt';
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import setCookie from '@/app/utils/set';
 
 
