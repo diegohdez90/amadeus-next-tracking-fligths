@@ -59,7 +59,21 @@ export default function Home() {
           const airports = await locationData.nearAirports(params.toString())
 
           console.log(airports);
-          
+          const rootFlights = []
+          for (let airport of airports) {
+            const params = new URLSearchParams({
+              departureAirportCode: airport.iataCode,
+              max: '2'
+            })
+            const destinations = await locationData.topDestinations(params.toString())
+            for (let destination of destinations) {
+              rootFlights.push({
+                origin: airport.iataCode,
+                departure: destination.iataCode
+              })
+            }
+          }
+          console.log(rootFlights)
 
         }
         return false
