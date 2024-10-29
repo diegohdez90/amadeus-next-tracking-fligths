@@ -27,13 +27,22 @@ const home = (() => {
       return data.slice(0,3)
     }
     return false
+  }
 
+  const getFlights = async (params: string) => {
+    const res = await fetch(`${baseUrl}/api/amadeus/flights?${params}`)
+    if (res.ok) {
+      const { data } = await res.json()
+      return data.slice(0,3)
+    }
+    return false
   }
 
 
   return {
     nearAirports,
-    topDestinations
+    topDestinations,
+    getFlights,
   }
 })()
 
