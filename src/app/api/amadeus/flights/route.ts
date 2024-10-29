@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       message: 'offers',
       data: res.data,
-      dictionaries: res.data?.dictionaries
+      dictionaries: res.result.dictionaries
     }, {
       status: HTTPStatus.OK
     });  
