@@ -4,6 +4,7 @@ import moment from 'moment';
 
 interface Props {
   bookFlight: (id: number) => void
+  dictionaries: any
   indexFlight: any
   segments: []
   price: any
@@ -16,6 +17,7 @@ interface Props {
 
 const FlightDetail: React.FC<Props> = ({
   bookFlight,
+  dictionaries,
   indexFlight,
   segments,
   price,
@@ -50,10 +52,8 @@ const FlightDetail: React.FC<Props> = ({
                 <div className="mt-2 flex sm:flex-row mx-6 sm:justify-between flex-wrap ">
                   <div className="flex flex-row place-items-center p-2">
                     <div className="flex flex-col ml-2">
-                      <p className="text-xs text-gray-500 font-bold"></p>
-                      {/* {dictionary.carriers[seg.carrierCode]} */}
-                      <p className="text-xs text-gray-500">{`${seg.aircraft.code} - `}</p>
-                      {/* ${dictionary.aircraft[seg.aircraft.code]} */}
+                      <p className="text-xs text-gray-500 font-bold">{dictionaries.carriers[seg.carrierCode]}</p>
+                      <p className="text-xs text-gray-500">{`${seg.aircraft.code} - ${dictionaries.aircraft[seg.aircraft.code]}`}</p>
                     </div>
                   </div>
 

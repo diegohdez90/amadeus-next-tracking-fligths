@@ -6,6 +6,12 @@ const NoFlightFoundLabel: React.FC = () => <div><h1>Not found</h1></div>
 
 interface Props {
   flights: [],
+  dictionaries: {
+    aircraft: {}
+    carriers: {}
+    currencies: {}
+    locations: {}
+  }
   limit: number
   page: number
 }
@@ -30,7 +36,8 @@ const FlightList: React.FC = (props: Props) => {
     if (flights.length > 0) {
       for (let flightIndex = start; flightIndex < flights.length; flightIndex++) {
         list.push(<FlightDetail
-          key={flights[flightIndex].id}
+          dictionaries={props.dictionaries}
+          key={`${flightIndex}-${flights[flightIndex].id}`}
           segments={flights[flightIndex].itineraries[0].segments}
           price={flights[flightIndex].price}
           travelerPricings={flights[flightIndex].travelerPricings}
