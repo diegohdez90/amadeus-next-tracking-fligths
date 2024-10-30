@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { Dropdown, DropdownHeader } from 'flowbite-react';
 import { home } from "./utils/amadeus";
 import FlightList from "@/components/List/Flights";
+import DatalistInput, {  useComboboxControls } from "react-datalist-input";
+import { useDebounce } from 'use-debounce'
+
 
 export default function Home() {
   const now = new Date();
@@ -21,14 +23,72 @@ export default function Home() {
   const formattedDate = `${year}-${month}-${day}`;
   const [date, setDate] = useState(formattedDate)
   const [flights, setFlights] = useState([])
+
+
+  const [dictionaries, setDictionaries] = useState<{
+    aircraft: {}
+    carriers: {}
+    currencies: {}
+    locations: {}
+  }>({
+     aircraft: {},
+    carriers: {},
+    currencies: {},
+    locations: {}
+  })
+
+  const { isExpanded: isExpandedOrigin, setIsExpanded: setIsExpandedOrigin, setValue: setValueExpandedOrigin, value: valueExpandedOrigin } = useComboboxControls({ isExpanded: false });
+  const [origin, setOrigin] = useState('')
+  const [originDebounce] =  useDebounce(origin, 2200)
+  const [originAirports, setOriginAirports] = useState([])
+  const [originAirport, setOriginAirport] = useState('')
+
+  const { isExpanded: isExpandedDestination, setIsExpanded: setIsExpandedDestination, setValue: setValueExpandedDestination, value: valueExpandedDestination } = useComboboxControls({ isExpanded: true });
+
+
+  const [destination, setDestination] = useState('')
+
+
   useEffect(() => {
+    if (originDebounce.length > 0) {
+      console.log('origin debounce', originDebounce);
+      const params = new URLSearchParams({
+        term: originDebounce
+      })
+      const getOriginAirport = async () => {
+        const data = await home.getAirports(params.toString())
+        const airports = data.map(airport =>
+          ({
+            key: airport.iataCode,
+            label: airport.name,
+            id: airport.iataCode,
+            value: airport.iataCode
+          })
+        )
+        console.log(airports)
+        setOriginAirports(airports)
+      }
+      getOriginAirport()    
+    } else {
+      setOriginAirports([])
+    }
+  }, [originDebounce])
+  
+  useEffect(() => {
+    if (originAirports.length == 0) return
+    console.log('updating orign')
+    setIsExpandedOrigin(true)
+  }, [originAirports]);
+
+  useEffect(() => {
+    
+    
     const geolocation = (() => {
       function get(): Promise<{ pos: GeolocationPosition } | { err: string }> {
         const geo = navigator.geolocation;
       
         return new Promise((resolve, reject) => {
           if (!geo) {
-            console.error("Geolocation is not supported by this browser.");
             reject({ err: "Geolocation is not supported by this browser." });
           } else {
             geo.getCurrentPosition((pos) => {
@@ -91,7 +151,29 @@ export default function Home() {
               departureDate: date,
               adults: '1',
             })
-            const resultFlight = await home.getFlights(params.toString())
+            const res = await home.getFlights(params.toString())
+            if (!res) {
+              continue
+            }
+            const {data: resultFlight, dictionaries} = res
+            setDictionaries((prev) => ({
+              aircraft: {
+                ...prev.aircraft,
+                ...(dictionaries.aircraft ? dictionaries.aircraft : {})
+              }, 
+              carriers: {
+                ...prev.carriers,
+                ...(dictionaries.carriers ? dictionaries.carriers : {})
+              },
+              currencies: {
+                ...prev.currencies,
+                ...(dictionaries.currencies ? dictionaries.currencies: {})
+              },
+              locations: {
+                ...prev.locations,
+                ...(dictionaries.locations ? dictionaries.locations : {})
+              }
+            }))
             setFlights((prev) => [...prev, ...resultFlight])
           }
           console.log(amadeusFlights)
@@ -106,8 +188,24 @@ export default function Home() {
       }
     };
 
-    // fetchLocation()
+    fetchLocation()
   }, [])
+
+  const onOriginInput = (e: any) => {
+    const value = e.target.value
+    setOrigin(value)
+  }
+
+  useEffect(() => {
+    setIsExpandedOrigin(false)
+  }, [origin])
+  
+
+  const selectCity = (city) => {
+    setOriginAirport(city.key)
+    setValueExpandedOrigin(city.key)
+    setIsExpandedOrigin(false)
+  }
 
   const onUpdateDepartureDate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDate(e.target.value)
@@ -117,40 +215,31 @@ export default function Home() {
     <div className="items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="container">
         
-        <div className="grid grid-rows-2 items-center gap-4">
+        <div className="flex flex-col items-center gap-4">
           <div className="flex gap-4 row-start-1 items-center flex-col sm:flex-col">
-            <div className="flex gap-4 items-center flex-col sm:flex-col">
-              <input
-              type='date'
-              onChange={onUpdateDepartureDate}
-              value={date} />
-            </div>
+            <label>Departure Date
+              <div className="flex gap-4 items-center flex-col sm:flex-col">
+                { date && <input
+                type='date'
+                onChange={onUpdateDepartureDate}
+                value={date} /> }
+              </div>
+            </label>
             <div className="flex gap-4 items-center flex-row">
               <div className="flex">
-                <label htmlFor="search-dropdown" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your Email</label>
-
-                <div className="relative w-full">
-                    <input type="search" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-all-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search Mockups, Logos, Design Templates..." required />
-                    <button type="submit" className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                        </svg>
-                        <span className="sr-only">Search</span>
-                    </button>
-                </div>
+                <DatalistInput
+                  placeholder='Select origin'
+                  onSelect={selectCity}
+                  onInput={onOriginInput}
+                  value={origin}
+                  items={originAirports}
+                  label='Origin'
+                  isExpanded={isExpandedOrigin}
+                  setIsExpanded={setIsExpandedOrigin}
+                />
               </div>
               <div className="flex">
-                <label htmlFor="search-dropdown" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your Email</label>
-
-                <div className="relative w-full">
-                    <input type="search" id="search-dropdown" className="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg border-all-gray-50 border-s-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-s-gray-700  dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500" placeholder="Search Mockups, Logos, Design Templates..." required />
-                    <button type="submit" className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                        <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                        </svg>
-                        <span className="sr-only">Search</span>
-                    </button>
-                </div>
+                {new String(isExpandedOrigin)}
               </div>
 
   
@@ -159,7 +248,7 @@ export default function Home() {
 
 
           <div>
-            <FlightList flights={flights} page={1} limit={10} />
+            <FlightList flights={flights} page={1} limit={10} dictionaries={dictionaries} />
           </div>
         </div>
       </main>
