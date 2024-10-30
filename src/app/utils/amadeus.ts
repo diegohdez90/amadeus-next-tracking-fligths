@@ -1,4 +1,4 @@
-const Amadeus = (await import('amadeus-ts')).default
+import Amadeus from 'amadeus-ts'
 import dotenv from 'dotenv';
 
 dotenv.config()
@@ -32,8 +32,20 @@ const home = (() => {
   const getFlights = async (params: string) => {
     const res = await fetch(`${baseUrl}/api/amadeus/flights?${params}`)
     if (res.ok) {
+      const { data, dictionaries } = await res.json()
+      return {
+        data: data.slice(0,3),
+        dictionaries: dictionaries
+      }
+    }
+    return false
+  }
+
+  const getAirports = async(params: string) => {
+    const res = await fetch(`${baseUrl}/api/amadeus/airports/search?${params}`)
+    if (res.ok) {
       const { data } = await res.json()
-      return data.slice(0,3)
+      return data
     }
     return false
   }
@@ -43,6 +55,7 @@ const home = (() => {
     nearAirports,
     topDestinations,
     getFlights,
+    getAirports,
   }
 })()
 
