@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import { Configuration } from 'webpack'
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {},
+  },
   webpack: (config: Configuration) => {
     config.resolve = {
       ...(config.resolve || {}),
