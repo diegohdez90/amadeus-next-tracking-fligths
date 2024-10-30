@@ -46,5 +46,5 @@ const home = (() => {
   }
 })()
 
-export {amadeus as default, home};
+export {amadeus , home};
 

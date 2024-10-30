@@ -1,4 +1,4 @@
-import amadeus from "@/app/utils/amadeus";
+import { amadeus } from "@/app/utils/amadeus";
 import HTTPStatus from 'http-status-codes';
 import { NextRequest, NextResponse } from "next/server";
 
