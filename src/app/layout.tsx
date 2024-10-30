@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import React from 'react';
 import localFont from "next/font/local";
+import 'react-datalist-input/dist/styles.css';
 import "./globals.css";
 import validateUser from "./utils/validate";
 import Logout from "@/components/Button/Logout";
+import Login from "@/components/Button/Login";
+import SignUp from "@/components/Button/SignUp";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -41,7 +44,14 @@ export default async function RootLayout({
             <div className="col-span-2 flex justify-center">
               <Logout />
             </div>
-          </div> : null
+          </div> : <div className="grid grid-cols-12 gap-4">
+            <div className="col-start-11 col-end-11 justify-center">
+              <Login />
+            </div>
+            <div className="col-start-12 col-end-12 justify-center">
+              <SignUp />
+            </div>
+          </div>
         }
         {children}
       </body>
