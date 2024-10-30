@@ -19,14 +19,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       message: 'offers',
       data: res.data,
-      dictionaries: res.result.dictionaries
+      dictionaries: res.result.dictionaries || {}
     }, {
       status: HTTPStatus.OK
     });  
   } else {
     return NextResponse.json({
       message: 'No flights found',
-      data: []
+      data: [],
     }, {
       status: HTTPStatus.FORBIDDEN
     });  
