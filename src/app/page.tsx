@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Dropdown, DropdownHeader } from 'flowbite-react';
-import { home as locationData } from "./utils/amadeus";
+import { home } from "./utils/amadeus";
 import FlightList from "@/components/List/Flights";
 
 export default function Home() {
@@ -66,7 +66,7 @@ export default function Home() {
             longitude: longitude.toString()
           });
 
-          const airports = await locationData.nearAirports(params.toString())
+          const airports = await home.nearAirports(params.toString())
 
           const rootFlights = []
           for (const airport of airports) {
@@ -74,7 +74,7 @@ export default function Home() {
               departureAirportCode: airport.iataCode,
               max: '2'
             })
-            const destinations = await locationData.topDestinations(params.toString())
+            const destinations = await home.topDestinations(params.toString())
             for (const destination of destinations) {
               rootFlights.push({
                 origin: airport.iataCode,
@@ -91,7 +91,7 @@ export default function Home() {
               departureDate: date,
               adults: '1',
             })
-            const resultFlight = await locationData.getFlights(params.toString())
+            const resultFlight = await home.getFlights(params.toString())
             setFlights((prev) => [...prev, ...resultFlight])
           }
           console.log(amadeusFlights)
