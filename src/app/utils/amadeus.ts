@@ -1,4 +1,4 @@
-import Amadeus from 'amadeus-ts'
+const Amadeus = (await import('amadeus-ts')).default
 import dotenv from 'dotenv';
 
 dotenv.config()
